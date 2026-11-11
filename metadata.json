@@ -1,0 +1,6 @@
+{
+  "name": "Sawaari - Bike Maintenance & Nepal Tax Journal",
+  "description": "Offline-first PWA for bike maintenance tracking, Nepal vehicle tax & Blue Book renewal alerts, document vault, and Bikram Sambat calendar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

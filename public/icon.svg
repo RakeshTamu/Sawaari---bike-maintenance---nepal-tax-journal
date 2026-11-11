@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <!-- Background with squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="496" height="496" x="8" y="8" rx="120" fill="none" stroke="url(#accent)" stroke-width="4" opacity="0.3"/>
+  
+  <!-- Outer glowing ring / Speedometer arc -->
+  <circle cx="256" cy="256" r="170" fill="none" stroke="#1e293b" stroke-width="24" stroke-dasharray="800" stroke-dashoffset="200" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="170" fill="none" stroke="url(#accent)" stroke-width="24" stroke-dasharray="800" stroke-dashoffset="440" stroke-linecap="round"/>
+  
+  <!-- Inner Shield / Bluebook Badge -->
+  <path d="M256 120 L330 155 V270 C330 330 256 375 256 375 C256 375 182 330 182 270 V155 Z" fill="url(#shield)" stroke="#38bdf8" stroke-width="8" stroke-linejoin="round"/>
+  
+  <!-- Bike Stylized Silhouette -->
+  <!-- Rear wheel -->
+  <circle cx="215" cy="280" r="28" fill="none" stroke="#38bdf8" stroke-width="9"/>
+  <circle cx="215" cy="280" r="10" fill="#38bdf8"/>
+  <!-- Front wheel -->
+  <circle cx="297" cy="280" r="28" fill="none" stroke="#10b981" stroke-width="9"/>
+  <circle cx="297" cy="280" r="10" fill="#10b981"/>
+  <!-- Bike Frame lines -->
+  <path d="M215 280 L245 245 L275 245 L297 280 M245 245 L235 220 L255 210 M275 245 L285 215 L275 210" fill="none" stroke="#f8fafc" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Checkmark / Valid Stamp Indicator -->
+  <circle cx="320" cy="180" r="22" fill="#10b981"/>
+  <path d="M312 180 L318 186 L330 174" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Small Nepal Flag triangular contour flair -->
+  <path d="M195 190 L212 178 L195 166 Z" fill="#ef4444" opacity="0.9"/>
+  <path d="M195 214 L212 202 L195 190 Z" fill="#ef4444" opacity="0.9"/>
+</svg>

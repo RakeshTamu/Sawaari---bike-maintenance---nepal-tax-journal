@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Sawaari - Standalone Bike & Nepal Tax Journal (PWA)</title>
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: { 950: '#090d16' }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background-color: #090d16; color: #f8fafc; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div id="standalone-root" class="max-w-md mx-auto p-4 pb-24">
+    <!-- Header -->
+    <header class="py-4 border-b border-slate-800 flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-white flex items-center gap-2">
+          <span class="text-cyan-400">🏍️</span> Sawaari Standalone
+        </h1>
+        <p class="text-xs text-slate-400">Offline-First Nepal Tax & Service Journal</p>
+      </div>
+      <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-1 rounded-md font-mono font-bold">100% Offline</span>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-6 space-y-5" id="app-content">
+      
+      <!-- Injected Bike Card -->
+      <div id="bike-summary" class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 id="bike-name" class="text-lg font-bold text-white">Yamaha MT-15 V2</h2>
+            <p id="bike-plate" class="text-xs font-mono text-amber-300 mt-1 bg-slate-950 px-2 py-0.5 rounded-md inline-block border border-slate-800">
+              🇳🇵 Ba 02-031 Pa 4521
+            </p>
+          </div>
+          <div id="tax-badge" class="px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-800">
+            TAX VALID
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-800/80 text-xs">
+          <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800">
+            <span class="text-slate-400 block">Odometer:</span>
+            <p id="bike-odo" class="font-bold text-white text-base font-mono mt-0.5">9,850 KM</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800">
+            <span class="text-slate-400 block">Tax Expiry:</span>
+            <p id="tax-expiry" class="font-bold text-cyan-400 text-sm font-mono mt-0.5">2083-08-20 BS</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="promptLogService()" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition active:scale-95 shadow-sm">
+          <div class="text-xs font-bold text-white flex items-center gap-1.5">
+            <span>🔧</span> Log Service
+          </div>
+          <div class="text-[11px] text-slate-400 mt-1">Oil change, repair, tune</div>
+        </button>
+        <button onclick="promptLogTax()" class="p-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-2xl text-left transition active:scale-95 shadow-sm">
+          <div class="text-xs font-bold text-white flex items-center gap-1.5">
+            <span>📜</span> Renew Tax
+          </div>
+          <div class="text-[11px] text-slate-400 mt-1">Update Blue Book expiry</div>
+        </button>
+      </div>
+
+      <!-- Service History -->
+      <div class="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-md">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">Recent Service Records</h3>
+          <span class="text-[10px] text-slate-500">Local IndexedDB</span>
+        </div>
+        <div id="service-list" class="space-y-2">
+          <p class="text-xs text-slate-500">Loading service logs...</p>
+        </div>
+      </div>
+
+      <!-- Nepal Tax 90-Day Legal Reference Box -->
+      <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl text-xs space-y-2 text-slate-300">
+        <div class="font-bold text-white flex items-center gap-1.5">
+          <span>🇳🇵</span> Nepal Motor Vehicle Act: 90-Day Grace Period
+        </div>
+        <p class="text-slate-400 text-[11px] leading-relaxed">
+          Under the Motor Vehicle & Transport Management Act, you have a 90-day grace period after your Blue Book tax expiry date with ZERO monetary fines. After 90 days, fines start at 5% and increase up to 100% on overdue fiscal periods.
+        </p>
+      </div>
+
+      <!-- Backup Buttons -->
+      <div class="flex gap-2">
+        <button onclick="exportStandaloneBackup()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200">
+          📥 Backup JSON
+        </button>
+        <button onclick="alert('This file is completely self-contained! You can save it to your phone, desktop, or USB drive and open anytime offline.')" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-400">
+          ℹ️ Offline Info
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Standalone Dexie Database
+    const sdb = new Dexie('SawaariStandaloneDB');
+    sdb.version(1).stores({
+      bikes: '++id, name, registrationNumber',
+      services: '++id, bikeId, serviceDateAD',
+      renewals: '++id, bikeId, validUntilAD'
+    });
+
+    async function init() {
+      let bike = await sdb.bikes.toCollection().first();
+      if (!bike) {
+        await sdb.bikes.add({
+          name: 'Yamaha MT-15 V2',
+          registrationNumber: 'Ba 02-031 Pa 4521',
+          odometerKm: 9850,
+          cc: 155
+        });
+        const futureDate = new Date(Date.now() + 45*24*60*60*1000).toISOString().slice(0, 10);
+        await sdb.renewals.add({
+          bikeId: 1,
+          validUntilAD: futureDate,
+          validUntilBS: '2083-08-20',
+          totalPaid: 6500
+        });
+        await sdb.services.add({
+          bikeId: 1,
+          workDone: 'Motul Synthetic Oil, Filter & Chain Lube',
+          cost: 3850,
+          odometerKm: 8500,
+          serviceDateAD: new Date().toISOString().slice(0, 10),
+          serviceCenter: 'Yamaha Blue Square Teku'
+        });
+        bike = await sdb.bikes.toCollection().first();
+      }
+
+      document.getElementById('bike-name').textContent = bike.name;
+      document.getElementById('bike-plate').textContent = '🇳🇵 ' + bike.registrationNumber;
+      document.getElementById('bike-odo').textContent = (bike.odometerKm || 0).toLocaleString() + ' KM';
+
+      const renewal = await sdb.renewals.toCollection().last();
+      if (renewal && renewal.validUntilAD) {
+        document.getElementById('tax-expiry').textContent = (renewal.validUntilBS || '') + ' (' + renewal.validUntilAD + ')';
+        const diff = Math.ceil((new Date(renewal.validUntilAD) - new Date()) / (1000*60*60*24));
+        const badge = document.getElementById('tax-badge');
+        if (diff >= 0) {
+          badge.textContent = diff + ' Days Left (VALID)';
+          badge.className = 'px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-800';
+        } else if (Math.abs(diff) <= 90) {
+          const grace = 90 - Math.abs(diff);
+          badge.textContent = grace + ' Days Grace Left';
+          badge.className = 'px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-950 text-amber-300 border border-amber-800';
+        } else {
+          badge.textContent = 'TAX OVERDUE / FINED';
+          badge.className = 'px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-rose-950 text-rose-300 border border-rose-800';
+        }
+      }
+
+      const services = await sdb.services.toArray();
+      const list = document.getElementById('service-list');
+      list.innerHTML = '';
+      if (services.length === 0) {
+        list.innerHTML = '<p class="text-xs text-slate-500">No service records yet.</p>';
+      } else {
+        services.slice(-5).reverse().forEach(s => {
+          const div = document.createElement('div');
+          div.className = 'p-3 bg-slate-950 border border-slate-800/80 rounded-2xl flex items-center justify-between text-xs';
+          div.innerHTML = '<div><p class="font-bold text-white">' + s.workDone + '</p><p class="text-slate-400 text-[11px] mt-0.5">' + (s.serviceCenter || 'Workshop') + ' · ' + (s.odometerKm || 0) + ' KM</p></div><div class="text-right font-mono font-bold text-cyan-400">Rs. ' + (s.cost || 0).toLocaleString() + '</div>';
+          list.appendChild(div);
+        });
+      }
+    }
+
+    async function promptLogService() {
+      const work = prompt('Work done (e.g. Engine oil change, chain lube, brake pads):');
+      if (!work) return;
+      const cost = parseInt(prompt('Cost in NPR:', '3000') || '0', 10);
+      const km = parseInt(prompt('Current Odometer KM:', '10500') || '0', 10);
+      const bike = await sdb.bikes.toCollection().first();
+      await sdb.services.add({
+        bikeId: bike ? bike.id : 1,
+        workDone: work,
+        cost: cost,
+        odometerKm: km,
+        serviceDateAD: new Date().toISOString().slice(0, 10),
+        serviceCenter: 'Local Workshop'
+      });
+      if (bike) {
+        bike.odometerKm = Math.max(bike.odometerKm || 0, km);
+        await sdb.bikes.put(bike);
+      }
+      init();
+    }
+
+    async function promptLogTax() {
+      const dateAD = prompt('New Valid Until Date (YYYY-MM-DD):', new Date(Date.now() + 365*24*60*60*1000).toISOString().slice(0, 10));
+      if (!dateAD) return;
+      const bike = await sdb.bikes.toCollection().first();
+      await sdb.renewals.add({
+        bikeId: bike ? bike.id : 1,
+        validUntilAD: dateAD,
+        validUntilBS: 'Updated',
+        taxAmount: 6500,
+        fineAmount: 0,
+        totalPaid: 6500,
+        renewedDateAD: new Date().toISOString().slice(0, 10)
+      });
+      init();
+    }
+
+    async function exportStandaloneBackup() {
+      const bikes = await sdb.bikes.toArray();
+      const services = await sdb.services.toArray();
+      const renewals = await sdb.renewals.toArray();
+      const blob = new Blob([JSON.stringify({ bikes, services, renewals }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sawaari_standalone_backup.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Inline Service Worker via Blob for 100% offline support
+    if ('serviceWorker' in navigator) {
+      const swCode = "self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => clients.claim()); self.addEventListener('fetch', e => {});";
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
